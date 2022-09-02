@@ -16,14 +16,17 @@ public class Manager
     /// </summary>
     public event BuildCompleteEvent? OnBuildComplete;
 
-    private Module[] _Modules;
+    private Module[] _Modules = Array.Empty<Module>();
     public Module[] Modules
     {
         get => _Modules;
         set
         {
             for (int i = 0; i < value.Length; i++)
+            {
+                value[i].Manager = this;
                 value[i].Index = i;
+            }
 
             _Modules = value;
         }
@@ -46,11 +49,11 @@ public class Manager
     }
 
     public void Build(byte[] data) =>
-        Build(data, 0);
+        Build(data, Modules.Length - 1);
 
     internal void Build(byte[] data, int index)
     {
-        if (index == Modules.Length)
+        if (index < 0)
             OnBuildComplete?.Invoke(data);
         else
             Modules[index].Build(data);
